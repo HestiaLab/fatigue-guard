@@ -1,0 +1,17 @@
+<Project Sdk="WixToolset.Sdk/6.0.2">
+
+  <PropertyGroup>
+    <OutputName>FatigueGuard-$(ProductVersion)-win-x64</OutputName>
+    <OutputType>Package</OutputType>
+    <Platform>x64</Platform>
+    <Platforms>x64</Platforms>
+    <DefineConstants>ProductVersion=$(ProductVersion);StagingDir=$(StagingDir)</DefineConstants>
+    <!-- 固定按用户安装到 LocalAppData：ICE38/ICE64/ICE91 只适用于漫游配置或 ALLUSERS 切换场景。 -->
+    <SuppressIces>ICE38;ICE64;ICE91</SuppressIces>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+  </ItemGroup>
+
+</Project>

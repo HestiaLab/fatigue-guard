@@ -69,6 +69,13 @@ FatigueGuard 使用以下第三方组件与模型。各组件版权归其各自�
 - 许可证：MIT
 - 版权：Copyright (c) Microsoft Corporation
 
+### WiX Toolset
+
+- 项目：https://github.com/wixtoolset/wix
+- 许可证：MS-RL（Microsoft Reciprocal License）
+- 版权：Copyright (c) .NET Foundation and contributors
+- 说明：仅在构建 MSI 安装包时使用（`WixToolset.Sdk` 与 `WixToolset.UI.wixext`），不是运行依赖；发布的 MSI 中不包含 WiX 的二进制文件。
+
 ## 完整许可证文本
 
 再分发本项目及其模型时，请同时保留以下文本：
@@ -78,4 +85,4 @@ FatigueGuard 使用以下第三方组件与模型。各组件版权归其各自�
 - `licenses/LGPL-2.1.txt`：GNU Lesser General Public License 2.1 全文（FFmpeg）。
 - `licenses/ONNX-Runtime-ThirdPartyNotices.txt`：ONNX Runtime 1.31.1 的第三方声明。
 
-适用 Apache-2.0 的组件包括 OpenCvSharp4、OpenCV、YuNet、MediaPipe Face Mesh（含 ONNX 导出）与 xUnit；适用 MIT 的组件包括 ONNX Runtime 与 Microsoft.NET.Test.Sdk；FFmpeg（经 OpenCV 视频 I/O 引入）适用 LGPL-2.1。模型权重再分发时请保留本文件与上述许可证文本。
+适用 Apache-2.0 的组件包括 OpenCvSharp4、OpenCV、YuNet、MediaPipe Face Mesh（含 ONNX 导出）与 xUnit；适用 MIT 的组件包括 ONNX Runtime 与 Microsoft.NET.Test.Sdk；FFmpeg（经 OpenCV 视频 I/O 引入）适用 LGPL-2.1；WiX Toolset 适用 MS-RL，仅在构建安装包时使用。模型权重再分发时请保留本文件与上述许可证文本。

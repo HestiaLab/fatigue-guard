@@ -15,6 +15,20 @@
 
 主要依赖：OpenCvSharp4（Apache-2.0）、ONNX Runtime（MIT）、YuNet（Apache-2.0）、MediaPipe Face Mesh ONNX（Apache-2.0）。详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 与 [models/README.md](models/README.md)。
 
+## 安装（MSI）
+
+最终用户可从 Releases 下载 `FatigueGuard-<version>-win-x64.msi` 后双击安装：
+
+- 按用户安装，**不需要管理员权限**；默认目录为 `%LOCALAPPDATA%\Programs\FatigueGuard`，可在向导中修改；
+- 向导依次为许可协议（Apache-2.0）、安装目录、安装进度与完成页；安装向导为简体中文（WiX 6 内置文案）；
+- 安装内容为 `FatigueGuard.exe`、`models/`、`README.md`、`LICENSE`、`NOTICE`、`THIRD_PARTY_NOTICES.md` 与 `licenses/`；
+- 开始菜单创建 `FatigueGuard` 快捷方式，默认参数启动（摄像头 0、无预览）；需要指定摄像头索引、预览或导出指标时，请在终端中运行（见下文“运行”）；
+- 卸载：设置 → 应用 → 已安装的应用 → `FatigueGuard` → 卸载，或运行 `msiexec /x FatigueGuard-<version>-win-x64.msi`；
+- 升级：直接安装新版本 MSI 即可，安装程序会自动卸载旧版本；
+- 安装包为 x64，要求 64 位 Windows 10/11。
+
+安装版与解压版功能完全一致；如果只想临时试用，也可以直接解压 zip 运行。安装包由 `scripts/build-installer.ps1` 构建，具体见“发布”。
+
 ## 构建与测试
 
 ```bash
@@ -260,6 +274,8 @@ src/FatigueGuard.Core/      帧源、检测器、EAR、校准、窗口、状态�
 src/FatigueGuard.Cli/       参数解析、终端渲染、组合根、信号处理
 tests/FatigueGuard.Core.Tests/
 tests/FatigueGuard.Cli.Tests/
+installer/                  WiX 6 MSI 安装包（按用户安装，不在解决方案中）
+scripts/                    构建脚本（MSI）
 models/                     ONNX 模型与契约说明
 samples/                    可选的本地媒体样本（大文件已 gitignore）
 ```
@@ -297,7 +313,9 @@ dotnet test tests/FatigueGuard.Cli.Tests -c Release --filter Category=Media
 7. 输出重定向到文件 → 无 ANSI、无 `\r`；
 8. 加 `--preview` → 预览正常刷新，人脸框与眼部轮廓可见；`--no-color`/重定向/`--quiet` 时按说明自动禁用。
 
-自动化侧已验证：视频模式确定性、状态机全表转换、颜色/状态行渲染、无 ANSI/无 `\r`、预览渲染与禁用回退、模型元数据与 SHA256、Ctrl+Break 取消路径（与 Ctrl+C 共用 `CancelKeyPress` 处理）退出码 130。真实 Ctrl+C 的设备释放、多人场景与预览视觉效果需在实机按上述步骤确认。
+自动化侧已验证：视频模式确定性、状态机全表转换、颜色/状态行渲染、无 ANSI/无 `\r`、预览渲染与禁用回退、模型元数据与 SHA256、Ctrl+Break 取消路径（与 Ctrl+C 共用 `CancelKeyPress` 处理）退出码 130；MSI 的静默安装/卸载、安装目录、开始菜单快捷方式与 ARP 信息已在本机验证。真实 Ctrl+C 的设备释放、多人场景与预览视觉效果需在实机按上述步骤确认。
+
+安装包另需人工确认：对话框文案与许可协议页显示正常、自定义安装目录生效、覆盖安装升级后快捷方式仍可用。
 
 ## 发布
 
@@ -307,5 +325,18 @@ dotnet publish src/FatigueGuard.Cli -c Release -r win-x64 --self-contained true 
 ```
 
 产物在 `src/FatigueGuard.Cli/bin/Release/net8.0/win-x64/publish/`。发布时会自动把 `models/` 复制到 publish 目录，因此 `FatigueGuard.exe` 可直接运行；模型仍以独立的 `models/` 文件夹随 exe 分发，不会打进单文件可执行程序。如果你手动移动 exe，请连同 `models/` 目录一起移动。
+
+### 构建 MSI
+
+```powershell
+pwsh -File scripts/build-installer.ps1
+```
+
+脚本会先发布 win-x64 自包含单文件到 `artifacts/installer/staging`（去掉 pdb，补齐文档与 `licenses/`），再从 `src/FatigueGuard.Cli/FatigueGuard.Cli.csproj` 读取 `<Version>` 调用 WiX 6 构建，最终输出 `artifacts/release/FatigueGuard-<version>-win-x64.msi`。首次构建会从 NuGet 还原 `WixToolset.Sdk` 与 `WixToolset.UI.wixext`。
+
+- MSI 项目（`installer/FatigueGuard.Installer.wixproj`）刻意不加入解决方案，避免 `dotnet build FatigueGuard.sln` 在缺少发布产物时失败；
+- 安装作用域为 per-user，装在 `%LOCALAPPDATA%\Programs\FatigueGuard`，快捷方式写入当前用户的开始菜单，卸载信息出现在“设置 → 应用”；
+- 包内字符串使用代码页 936（简体中文）；`installer/zh-CN.wxl` 声明 zh-CN 区域设置，使向导选用 WiX 6 内置的简体中文文案，ARP 说明与快捷方式描述同为中文；
+- 修改版本号只需改 CLI 项目的 `<Version>`：程序、MSI 与文件名会保持一致。
 
 对外分发二进制时请同时附带 `LICENSE`、`NOTICE`、`THIRD_PARTY_NOTICES.md` 与 `licenses/`（其中 FFmpeg 为 LGPL-2.1；自包含发布还包含 .NET 运行时的许可证/第三方声明），不要把 176MB 的 publish 输出提交到仓库。
