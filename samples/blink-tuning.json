@@ -1,0 +1,7 @@
+{
+  "blink": {
+    "closedThresholdRatio": 0.75,
+    "closedThresholdMax": 0.22,
+    "minClosedMs": 40
+  }
+}

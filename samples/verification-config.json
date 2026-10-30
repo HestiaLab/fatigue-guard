@@ -1,0 +1,9 @@
+{
+  "calibration": {
+    "seconds": 2
+  },
+  "blink": {
+    "closedThresholdRatio": 0.72,
+    "closedThresholdMax": 0.20
+  }
+}

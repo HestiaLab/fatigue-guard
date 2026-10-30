@@ -1,0 +1,14 @@
+bin/
+obj/
+artifacts/
+vibe_images/
+.vs/
+*.user
+*.suo
+TestResults/
+**/Properties/launchSettings.json
+samples/*.avi
+samples/*.mp4
+samples/*.mkv
+samples/*.mov
+*.receipt

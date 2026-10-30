@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FatigueGuard.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "--camera 0 --preview"
+    }
+  }
+}
