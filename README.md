@@ -115,6 +115,14 @@ FatigueGuard [options]
 - 视频模式仍按帧号/fps 确定性快速回放（不实时休眠），因此预览主要适合摄像头模式；刷新率跟随 `--refresh-hz`。
 - 运行期间调整终端窗口大小可能导致预览错位，建议保持窗口尺寸不变。
 
+### 中文与非 ASCII 路径
+
+OpenCV 的原生 DNN 在 Windows 上按系统 ANSI 代码页（简体中文默认为 GBK）解释路径字节，直接用中文目录加载 ONNX 会失败，典型报错是把路径显示成乱码的 `Can't read ONNX file: C:\Users\...\00_鏀朵欢绠...`。
+
+程序启动校验 SHA256 之后会检查模型路径：如果包含非 ASCII 字符，就把模型副本放进纯 ASCII 的临时目录（依次尝试 `%TEMP%\FatigueGuard\`、`%PROGRAMDATA%\FatigueGuard\`、`%SystemRoot%\Temp\`）并从那里加载；进程退出时删除这次运行的临时子目录，原始 `models/` 文件不会被修改或移动。找不到任何可写的 ASCII 目录时以退出码 4 退出并提示改用纯英文路径。加 `--verbose` 时会在 stderr 打印“模型路径包含非 ASCII 字符，已复制到 ASCII 临时目录加载。”
+
+注意：临时副本在进程退出前会占用与模型等量的磁盘空间（两个模型合计约 2.7 MB）。视频文件、`--config`、`--metrics-csv`、`--debug-frames` 的路径由 .NET 处理，中文路径正常可用。
+
 ## 配置
 
 命令行 > 配置文件 > 默认值。示例（即默认值）：

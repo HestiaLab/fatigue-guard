@@ -75,7 +75,7 @@ public static class Program
     }
 
     private static string Version =>
-        typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.1.0";
+        typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
     private static int Run(CliOptions options)
     {
@@ -102,7 +102,18 @@ public static class Program
             Log($"FaceMesh: {faceMeshPath} (SHA256 校验通过)");
         }
 
-        using FaceAnalyzer faceAnalyzer = CreateFaceAnalyzer(yunetPath, faceMeshPath, config, options);
+        using ModelFileLease yunetModel = ModelFileLease.Materialize(yunetPath);
+        using ModelFileLease faceMeshModel = ModelFileLease.Materialize(faceMeshPath);
+        if (verbose && (yunetModel.IsTemporary || faceMeshModel.IsTemporary))
+        {
+            Log("模型路径包含非 ASCII 字符，已复制到 ASCII 临时目录加载。");
+        }
+
+        using FaceAnalyzer faceAnalyzer = CreateFaceAnalyzer(
+            yunetModel.ModelPath,
+            faceMeshModel.ModelPath,
+            config,
+            options);
         if (verbose)
         {
             Log(faceAnalyzer.DescribeMetadata());

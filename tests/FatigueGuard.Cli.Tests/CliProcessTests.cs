@@ -23,7 +23,7 @@ public sealed class CliProcessTests
         CliResult result = CliRunner.Run("--version");
 
         Assert.Equal(0, result.ExitCode);
-        Assert.StartsWith("FatigueGuard 0.1.0", result.StdOut);
+        Assert.StartsWith("FatigueGuard 0.1.1", result.StdOut);
     }
 
     [Theory]
